@@ -80,10 +80,11 @@ def data():
 def submitPurchase():
 	form = SQLFORM.factory(
 			Field('Title','string'),
-			Field('Image','upload',uploadfolder=os.path.join(request.folder,'uploads')),
-			Field('Description','text'))
+			Field('user_image','upload',uploadfolder=os.path.join(request.folder,'static/uploads/')),
+			Field('Description','text'),
+			table_name='purchase')
 	if form.process().accepted:
-		db.purchase.insert(user_ref=auth.user, title = form.vars.Title, user_image=form.vars.user_image, description=form.vars.Description)
+		db.purchase.insert(user_ref=auth.user, title = form.vars.Title, user_image=request.vars.user_image, description=form.vars.Description)
 	
 	
 	return dict(form=form)
