@@ -4,8 +4,8 @@
 db.define_table('purchase',
                 Field('user_ref','reference auth_user'),
                 Field('title','string'),
-                Field('user_image','upload'),
-                Field('description','string'))
+                Field('user_image','upload',uploadseparate=True),
+                Field('description','text'))
 
 
 #Comments that people can leave on a post

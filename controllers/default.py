@@ -9,6 +9,7 @@
 ## - call exposes all registered services (none by default)
 #########################################################################
 
+import os
 
 def index():
     """
@@ -18,8 +19,7 @@ def index():
     if you need a simple wiki simple replace the two lines below with:
     return auth.wiki()
     """
-    response.flash = T("Welcome to web2py!")
-    return dict(message=T('Hello World'))
+    return dict()
 
 
 def user():
@@ -74,3 +74,22 @@ def data():
       LOAD('default','data.load',args='tables',ajax=True,user_signature=True)
     """
     return dict(form=crud())
+	
+#This is the page for a user to submit a purchase.
+@auth.requires_login()
+def submitPurchase():
+	form = SQLFORM.factory(
+			Field('Title','string'),
+			Field('Image','upload',uploadfolder=os.path.join(request.folder,'uploads')),
+			Field('Description','text'))
+	if form.process().accepted:
+		db.purchase.insert(user_ref=auth.user, title = form.vars.Title, user_image=form.vars.user_image, description=form.vars.Description)
+	
+	
+	return dict(form=form)
+	
+def viewPurchase():
+	if request.args(0):
+		row = db(db.purchase.id == request.args(0)).select().first()
+		
+	return dict(row=row)

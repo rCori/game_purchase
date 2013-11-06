@@ -1,0 +1,7 @@
+{{extend 'layout.html'}}
+
+{{if row:}}
+	<img src="{{=URL(f='download',args=row.user_image)}}">
+	<br>
+	{{=row.description}}
+{{pass}}
