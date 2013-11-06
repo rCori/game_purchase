@@ -80,7 +80,7 @@ def data():
 def submitPurchase():
 	form = SQLFORM.factory(
 			Field('Title','string'),
-			Field('user_image','upload',uploadfolder=os.path.join(request.folder,'static/uploads/')),
+			Field('user_image','upload',uploadfolder=os.path.join(request.folder,'uploads/')),
 			Field('Description','text'),
 			table_name='purchase')
 	if form.process().accepted:
