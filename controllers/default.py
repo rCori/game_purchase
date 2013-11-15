@@ -87,10 +87,12 @@ def submitPurchase():
 			Field('price','float'),
 			table_name='purchase')
 	if form.accepts(request.vars,formname='form'):
-		myFile = db.purchase.user_image.store(request.vars.user_image,'greatimage.jpg')
+		logger.info('form.vars.user_image is:'+form.vars.user_image)
+		logger.info('request.vars.user_image is:'+str(request.vars.user_image))
+		#myFile = db.purchase.user_image.store(request.vars.user_image,form.vars.user_image)
 		db.purchase.insert(user_ref=auth.user, title = form.vars.Title,
 							user_image=form.vars.user_image, 
-							description=myFile,
+							description=form.vars.Description,
 							store=form.vars.store,
 							store_loc = form.vars.located,
 							price = round(form.vars.price,2),

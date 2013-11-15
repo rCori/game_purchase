@@ -62,6 +62,39 @@ auth.settings.reset_password_requires_verification = True
 from gluon.contrib.login_methods.rpx_account import use_janrain
 use_janrain(auth, filename='private/janrain.key')
 
+import logging, logging.handlers
+
+def get_configured_logger(name):
+    logger = logging.getLogger(name)
+    if (len(logger.handlers) == 0):
+        # This logger has no handlers, so we can assume it hasn't yet been configured
+        # (Configure logger)
+
+        # Create default handler
+        if request.env.web2py_runtime_gae:
+            # Create GAEHandler
+            handler = GAEHandler()
+        else:
+            # Create RotatingFileHandler
+            import os
+            formatter="%(asctime)s %(levelname)s %(process)s %(thread)s %(funcName)s():%(lineno)d %(message)s"
+            handler = logging.handlers.RotatingFileHandler(os.path.join(request.folder,'private/app.log'),maxBytes=1024,backupCount=2)
+            handler.setFormatter(logging.Formatter(formatter))
+
+        handler.setLevel(logging.DEBUG)
+
+        logger.addHandler(handler)
+        logger.setLevel(logging.DEBUG)
+
+        # Test entry:
+        logger.debug(name + ' logger created')
+    else:
+        # Test entry:
+        logger.debug(name + ' already exists')
+	return logger
+	
+logger = get_configured_logger(request.application)
+
 #########################################################################
 ## Define your tables below (or better in another model file) for example
 ##
