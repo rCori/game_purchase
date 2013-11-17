@@ -100,8 +100,19 @@ def submitPurchase():
 							)
 	return dict(form=form)
 	
-def viewPurchase():
+def viewPurchases():
+	if request.vars['pgnum']:
+		page = request.vars['pgnum']
+	else:
+		page = 0
+	rows = db(db.purchase.id > 0).select(orderby=~db.purchase.time_submitted, limitby=(0+(page*25),25+(page*25)))
+	return dict(rows=rows)
+	
+def viewSingle():
 	if request.args(0):
-		row = db(db.purchase.id == request.args(0)).select().first()
+		myID=request.args(0)
+		row = db(db.purchase.id == myID).select().first()
+		return dict(row=row)
+	else:
+		return dict()
 		
-	return dict(row=row)

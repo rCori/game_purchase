@@ -1,0 +1,21 @@
+{{extend 'layout.html'}}
+
+<link rel="stylesheet" type="text/css" href="{{=URL('static','css/viewPurchasesLayout.css')}}">
+
+<table id="purchaseTable" border="1">
+{{for row in rows:}}
+	<tr>
+		<td>
+			<a href="{{=URL('default','viewSingle',args=row.id)}}"><img src="{{=URL(f='download',args=row.user_image)}}"></a>
+		</td>
+		<td>
+			{{=row.description}} at {{=row.store}} for ${{=row.price}}
+			<br>
+			bought by {{=row.user_ref.email}} on {{=row.time_submitted}}
+		</td>
+		<td>
+			{{=row.average_score}}/10
+		</td>
+	</tr>
+{{pass}}
+</table>

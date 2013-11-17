@@ -1,5 +1,6 @@
 # coding: utf8
 import os
+import datetime
 
 #The table of posts of user's purchases submissions
 db.define_table('purchase',
@@ -10,6 +11,7 @@ db.define_table('purchase',
 				Field('store_loc','string'),
 				Field('price','float'),
                 Field('description','text'),
+				Field('time_submitted','datetime',default=request.now),
 				Field('average_score','float'))
 
 

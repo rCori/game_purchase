@@ -1,0 +1,21 @@
+{{extend 'layout.html'}}
+
+{{if row:}}
+<!-- Expected page -->
+
+<h1>{{=row.description}}</h1>
+<br>
+<h4>${{=row.price}}</h4>
+<br>
+<img src="{{=URL(f='download',args=row.user_image)}}">
+<br>
+<p>bought by {{=row.user_ref.email}} at {{=row.store}}</p>
+<p>{{=row.time_submitted}}</p>
+<p>Average Score: {{=row.average_score}}</p>
+
+{{else:}}
+<!-- Handle a bad URL -->
+
+<h1> Oops, you weren't supposed to see this, please go back</h1>
+
+{{pass}}
