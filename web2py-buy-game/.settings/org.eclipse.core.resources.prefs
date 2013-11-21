@@ -1,0 +1,15 @@
+eclipse.preferences.version=1
+encoding//applications/atakatu/controllers/default.py=utf-8
+encoding//applications/atakatu/models/db.py=utf-8
+encoding//applications/db_lecture/controllers/default.py=utf-8
+encoding//applications/db_lecture/models/db.py=utf-8
+encoding//applications/lecture3/controllers/default.py=utf-8
+encoding//applications/lecture3/models/db.py=utf-8
+encoding//applications/lecture3/models/menu.py=utf-8
+encoding//applications/lecture8/controllers/default.py=utf-8
+encoding//applications/newsmap/controllers/default.py=utf-8
+encoding//applications/newsmap/models/news.py=utf8
+encoding//examples/routes.parametric.example.py=utf-8
+encoding//examples/routes.patterns.example.py=utf-8
+encoding/routes.py=utf-8
+encoding/web2py.py=utf-8
