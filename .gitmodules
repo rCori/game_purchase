@@ -1,0 +1,3 @@
+[submodule "web2py-buy-game/applications/game_purchase"]
+	path = web2py-buy-game/applications/game_purchase
+	url = git@github.com:rCori/game_purchase.git
