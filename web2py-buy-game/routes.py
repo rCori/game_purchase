@@ -6,7 +6,7 @@
 # are used when the respective element is missing from the
 # (possibly rewritten) incoming URL
 #
-default_application = 'buy_game'    # ordinarily set in base routes.py
+default_application = 'game_purchase'    # ordinarily set in base routes.py
 default_controller = 'default'  # ordinarily set in app-specific routes.py
 default_function = 'index'      # ordinarily set in app-specific routes.py
 
