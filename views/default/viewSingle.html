@@ -1,5 +1,8 @@
 {{extend 'layout.html'}}
 
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
 <div id="toplogo" style="max-width:499px;">
     <img src="{{=URL('static','images/smalllogo.png')}}">
 </div>
@@ -20,6 +23,29 @@
 
 <p>{{=row.time_submitted}}</p>
 
+<script>
+$(function() {
+	$( "#slider" ).slider({
+		step:1,
+		min:1,
+		max:10,
+		stop: function( event, ui ) {
+			var selection = $( "#slider" ).slider( "value" );
+			$('#slider_val').html(selection);
+		}
+	});
+	$("#submit_rev").click({
+	
+	});
+});
+
+
+</script>
+<div id="slider"></div>
+<button id="submit_rev">submit</button>
+<br>
+<span id="slider_val"></span>
+
 
 {{else:}}
 <!-- Handle a bad URL -->
@@ -27,3 +53,4 @@
 <h1> Oops, you weren't supposed to see this, please go back</h1>
 
 {{pass}}
+
