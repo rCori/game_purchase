@@ -102,7 +102,7 @@ routers = dict(
 
     # base router
     BASE=dict(
-        default_application='takatu',
+        default_application='welcome',
     ),
 )
 

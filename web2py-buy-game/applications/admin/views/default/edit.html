@@ -6,7 +6,7 @@
   def listfiles(app, dir, regexp='.*\.py$'):
       files = sorted(
          listdir(apath('%(app)s/%(dir)s/' % {'app':app, 'dir':dir}, r=request), regexp))
-      files = [x.replace('\\', '/') for x in files if not x.endswith('.bak')]
+      files = [x.replace(os.path.sep, '/') for x in files if not x.endswith('.bak')]
       return files
 
   def editfile(path,file,vars={}):
@@ -14,11 +14,12 @@
       url = URL('edit', args=args, vars=vars)
       return A(file, _class='editor_filelink', _href=url, _style='word-wrap: nowrap;')
 }}
-{{cm=URL('static','codemirror')}}
+{{cm=URL('static%s' % (response.static_version and '/_' + response.static_version  or ''),'codemirror')}}
+{{js_url=URL('static%s' % (response.static_version and '/_' + response.static_version  or ''),'js')}}
+{{css_url=URL('static%s' % (response.static_version and '/_' + response.static_version  or ''),'css')}}
 <link rel="stylesheet" href="{{=cm}}/lib/codemirror.css">
 <link rel="stylesheet" href="{{='%s/theme/%s.css' % (cm, editor_settings['theme'])}}">
 <script src="{{=cm}}/lib/codemirror.js"></script>
-<script src="{{=cm}}/mode/clike/clike.js"></script>
 <script src="{{=cm}}/addon/edit/matchbrackets.js"></script>
 <script src="{{=cm}}/addon/edit/closetag.js"></script>
 {{if editor_settings['editor'] != 'default':}}<script src="{{='%s/keymap/%s.js' % (cm, editor_settings['editor'])}}"></script>{{pass}}
@@ -38,40 +39,49 @@
 <script src="{{=cm}}/addon/selection/active-line.js"></script>
 <script src="{{=cm}}/addon/display/fullscreen.js"></script>
 <link rel="stylesheet" href="{{=cm}}/addon/display/fullscreen.css">
+<script src="{{=cm}}/addon/fold/foldcode.js"></script>
+<script src="{{=cm}}/addon/fold/foldgutter.js"></script>
+<script src="{{=cm}}/addon/fold/brace-fold.js"></script>
+<script src="{{=cm}}/addon/fold/xml-fold.js"></script>
+<script src="{{=cm}}/addon/fold/comment-fold.js"></script>
+<script src="{{=cm}}/addon/fold/indent-fold.js"></script>
+<link rel="stylesheet" href="{{=cm}}/addon/fold/foldgutter.css">
 <script src="{{=cm}}/emmet.min.js"></script>
-<script src="{{=URL('static','js/ajax_editor.js')}}"></script>
-<link rel="stylesheet" href="{{=URL('static/css','typeahead.js-bootstrap.css')}}">
-<link rel="stylesheet" href="{{=URL('static/css','web2py-codemirror.css')}}">
+<script src="{{=js_url}}/ajax_editor.js"></script>
+<link rel="stylesheet" href="{{=css_url}}/typeahead.js-bootstrap.css">
+<link rel="stylesheet" href="{{=css_url}}/web2py-codemirror.css">
 <script type="text/javascript">
-var current_theme = "{{=editor_settings['theme']}}";  //Default theme
-var current_editor = "{{=editor_settings['editor']}}";  //Default editor
-var current_font_incr = 0; // Default font-size, 0 means don't set
-jQuery(document).on('shown click', 'a[data-toggle="tab"]', function (e) {
-    var tab_id = jQuery(this).attr('href');
-    var editor = jQuery(tab_id + " textarea").data('editor');
+var current_font_incr = 0; // Default font-size, 0 means isn't set
+$(document).on('shown click', 'a[data-toggle="tab"]', function (e) {
+    var tab_id = $(this).attr('href');
+    var editor = $(tab_id + " textarea").data('editor');
     if (editor) {
-        editor.setSize(jQuery(tab_id).width(),  jQuery(tab_id).height());
+        editor.setSize('100%',  $(tab_id).height());
         editor.refresh();
     }
-    //jQuery(function(){jQuery('.CodeMirror-scroll').css("height","auto").css("overflow-x","auto");});
+    var n_li = $('#filesTab li').length;
+    $.each($('#filesTab li'), function(index, element) {
+        $(element).css('max-width', 100/n_li + '%' );
+    });
+    //$(function(){$('.CodeMirror-scroll').css("height","auto").css("overflow-x","auto");});
 });
 
 // Close the selected tab
-jQuery(document).on('click', '#filesTab button[class="close"]', function (e) {
-    var tab_body   = jQuery(jQuery(this).parent().attr("href"));  // it should be a div
-    var tab_header = jQuery(this).parent().parent();              // it should be a li
-    var saved = jQuery(tab_body.find('textarea').data('editor')).data('saved');
+$(document).on('click', '#filesTab button[class="close"]', function (e) {
+    var tab_body   = $($(this).parent().attr("href"));  // it should be a div
+    var tab_header = $(this).parent().parent();              // it should be a li
+    var saved = $(tab_body.find('textarea').data('editor')).data('saved');
     var close = true;
     if (saved === false) {
         close = confirm("You are closing an unsaved file")
     }
     if (close) {
-        if (tab_header.hasClass('active') === true) { 	//Set active an other tab
-            var $prev = jQuery(tab_header).prev();
+        if (tab_header.hasClass('active') === true) {     //Set active an other tab
+            var $prev = $(tab_header).prev();
             if ($prev.length) {
                 $prev.children('a[data-toggle="tab"]').tab('show'); // select previous tab
             } else {
-                jQuery(tab_header).next().children('a[data-toggle="tab"]').tab('show'); // select next tab
+                $(tab_header).next().children('a[data-toggle="tab"]').tab('show'); // select next tab
             }
         }
         tab_header.remove(); //remove li of tab
@@ -80,86 +90,82 @@ jQuery(document).on('click', '#filesTab button[class="close"]', function (e) {
 });
 
 // Revert current file
-jQuery(document).on('click', '#revert', function (e) {
+$(document).on('click', '#revert', function (e) {
     e.preventDefault();
-    load_file(jQuery(this).attr("href"));
+    load_file($(this).attr("href"));
 });
 // Restore current file
-jQuery(document).on('click', '#restore', function (e) {
+$(document).on('click', '#restore', function (e) {
     e.preventDefault();
-    load_file(jQuery(this).attr("href"));
+    load_file($(this).attr("href"));
 });
 
 // open the selected file
-jQuery(document).on('click', 'a.editor_filelink, a#editor_settingslink', function (e) {
-	e.preventDefault();
-	var url = jQuery(this).attr("href");
-	load_file(url);
+$(document).on('click', 'a.editor_filelink, a#editor_settingslink', function (e) {
+    e.preventDefault();
+    var url = $(this).attr("href");
+    load_file(url);
 });
 
-function update_theme(name) {
-	var href = "{{="%s/theme/" % cm}}" + name + ".css";
-	var link = jQuery("<link>");
-	link.attr({
-		type: 'text/css',
-		rel: 'stylesheet',
-		href: href
-	});
-	jQuery("head").append( link ); 
-	jQuery('textarea[name="data"]') .each(function(id, ta) {
-		editor = jQuery(ta).data('editor');
-		editor.setOption("theme", name);
-	});
-	current_theme = name;
-}
+/* This method updates all editors already instantiated with the selected preferences*/
+function update_editor(preferences) {
+    var href = "{{="%s/theme/" % cm}}" + preferences.theme + ".css";
+    var link = $("<link>");
+    link.attr({
+        type: 'text/css',
+        rel: 'stylesheet',
+        href: href
+    });
+    $("head").append( link );
+    if ( preferences.editor != 'default'){
+        var src = "{{='%s/keymap/' % cm}}" + preferences.editor + ".js";
+        //var src = "/admin/static/codemirror/keymap/" + editor_name + ".js";
+        var script = $("<script>");
+        script.attr({
+            src: src
+        });
+        $("head").append( script );
+    }
 
-function update_editor(editor_name) {
-	if (editor_name !='default'){
-		var src = "{{='%s/keymap/' % cm}}" + editor_name + ".js"; 
-		//var src = "/admin/static/codemirror/keymap/" + editor_name + ".js"; 
-		var script = jQuery("<script>");
-		script.attr({
-			src: src
-		});
-		jQuery("head").append( script ); 
-	}
-	jQuery('textarea[name="data"]') .each(function(id, ta) {
-		editor = jQuery(ta).data('editor');
-		editor.setOption("keyMap", editor_name);
-	});
-	current_editor = editor_name;
-
+    $('textarea[name="data"]') .each(function(id, ta) {
+        editor = $(ta).data('editor');
+        editor.setOption("theme", preferences.theme);
+        editor.setOption("keyMap", preferences.editor);
+        editor.setOption("autoCloseTags", (preferences.closetag === 'true'));
+        editor.setOption("foldGutter", (preferences.codefolding === 'true'));
+        editor.setOption("indentUnit", parseInt(preferences.tabwidth));
+        editor.setOption("tabSize", parseInt(preferences.tabwidth));
+        editor.setOption("indentWithTabs", (preferences.indentwithtabs === 'true'));
+        gutters = editor.getOption("gutters");
+        if ( preferences.linenumbers === 'true' && $.inArray('CodeMirror-linenumbers', gutters) === -1 ) {
+            gutters.splice(0, 0, 'CodeMirror-linenumbers');
+            editor.setOption("gutter", gutters);
+        }
+        editor.setOption("lineNumbers", (preferences.linenumbers === 'true'));
+        editor.setOption("styleActiveLine", (preferences.highlightline === 'true'));
+    });
 }
 
 // incr/decr editor font-size
-jQuery(document).on('click', 'a.font_button', function (e) {
+$(document).on('click', 'a.font_button', function (e) {
     e.preventDefault();
-    var id = jQuery(this).attr('id');
+    var id = $(this).attr('id');
     var new_font_incr;
     switch (id) {
         case 'incr': new_incr = 2; break;
         case 'decr': new_incr = -2; break;
-        case 'default': new_incr = 0; break;
+        case 'default': new_incr = 0;
     }
-    jQuery('textarea[name="data"]').each(function(id, ta) {
-        editor = jQuery(ta).data('editor');
+    $('textarea[name="data"]').each(function(id, ta) {
+        editor = $(ta).data('editor');
         set_font(editor, new_incr);
     });
     current_font_incr = (new_incr !== 0) ? current_font_incr + new_incr : 0;
 });
 
-    function winHeight() {
-        return window.innerHeight || (document.documentElement || document.body).clientHeight;
-    }
-    CodeMirror.on(window, "resize", function() {
-        var showing = document.body.getElementsByClassName("CodeMirror-fullscreen")[0];
-        if (!showing) return;
-        showing.CodeMirror.getWrappererElement().style.height = winHeight() + "px";
-    });
-
-    {{if len(request.args) > 1:}}
-        load_file('{{=URL(f='edit', args=request.args, vars=request.get_vars)}}');
-    {{pass}}
+{{if len(request.args) > 1:}}
+    load_file('{{=URL(f='edit', args=request.args, vars=request.get_vars)}}');
+{{pass}}
 
 </script>
 
@@ -168,7 +174,7 @@ jQuery(document).on('click', 'a.font_button', function (e) {
 <div class='row-fluid'>
 <div class="right controls btn-toolbar pull-right">
 <div class="btn-group">
-  <a class="button btn" onclick="jQuery('#files').toggle(); return false" href="#">Files toggle</a>
+  <a class="button btn" onclick="$('#files').toggle(); return false" href="#">Files toggle</a>
 </div>
 <div class="btn-group">
     <a id="decr" class="button btn font_button">-</a>
@@ -192,10 +198,9 @@ jQuery(document).on('click', 'a.font_button', function (e) {
             <ul class="nav nav-list" rel="pagebookmark" id="filelist">
             <li><input type="text" placeholder="{{=T('Rapid Search')}}" class="input-block-level typeahead-tw search-query"></li>
             {{dirs=[{'name':'models', 'reg':'.*\.py$'},
-                {'name':'controllers', 'reg':'.*\.py$'},
-                {'name':'views', 'reg':'[\w/\-]+(\.\w+)+$'},
-                {'name':'modules', 'reg':'.*\.py$'},
-                {'name':'private', 'reg': '[^\.#].*'}]}}
+                    {'name':'controllers', 'reg':'.*\.py$'},
+                    {'name':'views', 'reg':'[\w/\-]+(\.\w+)+$'},
+                    {'name':'modules', 'reg':'.*\.py$'}, ]}}
             {{auto_complete_list=[]}}
             {{for dir in dirs:}}
             <li class="nav-header component" onclick="collapse('{{="%s_files" % dir['name']}}');">{{=dir['name']}}</li>
@@ -224,26 +229,26 @@ jQuery(document).on('click', 'a.font_button', function (e) {
     </div>
 </div>
 <script>
-jQuery(document).ready(function() {
-    var filesMenu = jQuery('#files');
+$(document).ready(function() {
+    var filesMenu = $('#files');
     var ow = filesMenu.outerWidth();
     filesMenu.width(ow);
-    setTimeout( function(){jQuery('#files').css('left', '-'+ow+'px');}, 1000);
+    $('#files').css('left', '-'+ow+'px');
 });
 </script>
 <!-- Typeahead scripts here so the page load faster -->
-<script src="{{=URL('static/js', 'typeahead.min.js')}}"></script>
-<script src="{{=URL('static/js', 'hogan-2.0.0.js')}}"></script>
+<script src="{{=URL('static%s' % (response.static_version and '/_' + response.static_version  or ''), 'js/typeahead.min.js')}}"></script>
+<script src="{{=URL('static%s' % (response.static_version and '/_' + response.static_version  or ''), 'js/hogan-2.0.0.js')}}"></script>
 <script>
-    jQuery('.typeahead-tw').typeahead({
+    $('.typeahead-tw').typeahead({
         name: 'files',
         local:{{from gluon.serializers import json}}{{=XML(json(auto_complete_list))}},
         template: template_js,
         engine: Hogan,
     });
-    jQuery(document).on("typeahead:selected", '.typeahead', function(e, datum) {
+    $(document).on("typeahead:selected", '.typeahead', function(e, datum) {
         load_file(datum.link);
-        jQuery(this).val('');
+        $(this).val('');
     });
 </script>
 <!-- end "edit" block -->

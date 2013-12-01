@@ -104,7 +104,7 @@
         <span class="summary-sig-arg">pool_size</span>=<span class="summary-sig-default">0</span>,
         <span class="summary-sig-arg">folder</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">db_codec</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">UTF-8</code><code class="variable-quote">'</code></span>,
-        <span class="summary-sig-arg">credential_decoder</span>=<span class="summary-sig-default">&lt;function IDENTITY at 0x3ea99b0&gt;</span>,
+        <span class="summary-sig-arg">credential_decoder</span>=<span class="summary-sig-default">&lt;function IDENTITY at 0x31ed1b8&gt;</span>,
         <span class="summary-sig-arg">driver_args</span>=<span class="summary-sig-default"><code class="variable-group">{</code><code class="variable-group">}</code></span>,
         <span class="summary-sig-arg">adapter_args</span>=<span class="summary-sig-default"><code class="variable-group">{</code><code class="variable-group">}</code></span>,
         <span class="summary-sig-arg">do_connect</span>=<span class="summary-sig-default">True</span>,
@@ -804,6 +804,25 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a href="gluon.dal.MongoDBAdapter-class.html#ILIKE" class="summary-sig-name">ILIKE</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">first</span>,
+        <span class="summary-sig-arg">second</span>)</span><br />
+      case in-sensitive like operator</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="gluon.dal-pysrc.html#MongoDBAdapter.ILIKE">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a href="gluon.dal.MongoDBAdapter-class.html#LIKE" class="summary-sig-name">LIKE</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">first</span>,
         <span class="summary-sig-arg">second</span>)</span><br />
@@ -877,7 +896,6 @@
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="gluon.dal.NoSQLAdapter-class.html" onclick="show_private();">NoSQLAdapter</a></code></b>:
       <code><a href="gluon.dal.NoSQLAdapter-class.html#AGGREGATE">AGGREGATE</a></code>,
       <code><a href="gluon.dal.NoSQLAdapter-class.html#EXTRACT">EXTRACT</a></code>,
-      <code><a href="gluon.dal.NoSQLAdapter-class.html#ILIKE">ILIKE</a></code>,
       <code><a href="gluon.dal.NoSQLAdapter-class.html#LEFT_JOIN">LEFT_JOIN</a></code>,
       <code><a href="gluon.dal.NoSQLAdapter-class.html#LENGTH">LENGTH</a></code>,
       <code><a href="gluon.dal.NoSQLAdapter-class.html#LOWER">LOWER</a></code>,
@@ -1053,7 +1071,7 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="uploads_in_blob"></a><span class="summary-name">uploads_in_blob</span> = <code title="True">True</code>
+        <a name="uploads_in_blob"></a><span class="summary-name">uploads_in_blob</span> = <code title="False">False</code>
     </td>
   </tr>
 <tr>
@@ -1160,7 +1178,7 @@ der to work.'}"><code class="variable-group">{</code><code class="variable-quote
         <span class="sig-arg">pool_size</span>=<span class="sig-default">0</span>,
         <span class="sig-arg">folder</span>=<span class="sig-default">None</span>,
         <span class="sig-arg">db_codec</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">UTF-8</code><code class="variable-quote">'</code></span>,
-        <span class="sig-arg">credential_decoder</span>=<span class="sig-default">&lt;function IDENTITY at 0x3ea99b0&gt;</span>,
+        <span class="sig-arg">credential_decoder</span>=<span class="sig-default">&lt;function IDENTITY at 0x31ed1b8&gt;</span>,
         <span class="sig-arg">driver_args</span>=<span class="sig-default"><code class="variable-group">{</code><code class="variable-group">}</code></span>,
         <span class="sig-arg">adapter_args</span>=<span class="sig-default"><code class="variable-group">{</code><code class="variable-group">}</code></span>,
         <span class="sig-arg">do_connect</span>=<span class="sig-default">True</span>,
@@ -2080,6 +2098,31 @@ der to work.'}"><code class="variable-group">{</code><code class="variable-quote
   </dl>
 </td></tr></table>
 </div>
+<a name="ILIKE"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">ILIKE</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">first</span>,
+        <span class="sig-arg">second</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="gluon.dal-pysrc.html#MongoDBAdapter.ILIKE">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>case in-sensitive like operator</p>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="gluon.dal.BaseAdapter-class.html#ILIKE">BaseAdapter.ILIKE</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
 <a name="LIKE"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -2274,7 +2317,7 @@ der to work.'}"><code class="variable-group">{</code><code class="variable-quote
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Mon Oct  7 13:52:59 2013
+    Generated by Epydoc 3.0.1 on Thu Nov 28 13:54:40 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

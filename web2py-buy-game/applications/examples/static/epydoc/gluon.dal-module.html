@@ -228,6 +228,14 @@ help(Field)
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a href="gluon.dal.NDBDecimalProperty-class.html" class="summary-name" onclick="show_private();">NDBDecimalProperty</a><br />
+      NDB decimal implementation
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a href="gluon.dal.ConnectionPool-class.html" class="summary-name" onclick="show_private();">ConnectionPool</a>
     </td>
   </tr>
@@ -307,6 +315,14 @@ help(Field)
     </td><td class="summary">
         <a href="gluon.dal.MSSQL3Adapter-class.html" class="summary-name" onclick="show_private();">MSSQL3Adapter</a><br />
       experimental support for pagination in MSSQL
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="gluon.dal.MSSQL4Adapter-class.html" class="summary-name" onclick="show_private();">MSSQL4Adapter</a><br />
+      support for true pagination in MSSQL &gt;= 2012
     </td>
   </tr>
 <tr class="private">
@@ -440,7 +456,8 @@ help(Field)
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="gluon.dal.GoogleDatastoreAdapter-class.html" class="summary-name" onclick="show_private();">GoogleDatastoreAdapter</a>
+        <a href="gluon.dal.GoogleDatastoreAdapter-class.html" class="summary-name" onclick="show_private();">GoogleDatastoreAdapter</a><br />
+      NDB:
     </td>
   </tr>
 <tr class="private">
@@ -1291,7 +1308,7 @@ the records are identified by the query=Query(...) object.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="PYTHON_VERSION"></a><span class="summary-name">PYTHON_VERSION</span> = <code title="2">2</code>
+        <a name="PYTHON_VERSION"></a><span class="summary-name">PYTHON_VERSION</span> = <code title="(2, 7, 5)"><code class="variable-group">(</code>2<code class="variable-op">, </code>7<code class="variable-op">, </code>5<code class="variable-group">)</code></code>
     </td>
   </tr>
 <tr class="private">
@@ -1309,15 +1326,15 @@ the records are identified by the query=Query(...) object.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="gluon.dal-module.html#TABLE_ARGS" class="summary-name" onclick="show_private();">TABLE_ARGS</a> = <code title="set(['actual_name',
-     'common_filter',
+        <a href="gluon.dal-module.html#TABLE_ARGS" class="summary-name" onclick="show_private();">TABLE_ARGS</a> = <code title="set(['common_filter',
      'fake_migrate',
      'fields',
      'format',
      'migrate',
      'on_define',
      'plural',
-..."><code class="variable-group">set([</code><code class="variable-quote">'</code><code class="variable-string">actual_name</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">common_filter</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">fake_migrat</code><code class="variable-ellipsis">...</code></code>
+     'polymodel',
+..."><code class="variable-group">set([</code><code class="variable-quote">'</code><code class="variable-string">common_filter</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">fake_migrate</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">fields</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr class="private">
@@ -1909,14 +1926,14 @@ Insert a field
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-group">set([</code><code class="variable-quote">'</code><code class="variable-string">actual_name</code><code class="variable-quote">'</code><code class="variable-op">,</code>
-     <code class="variable-quote">'</code><code class="variable-string">common_filter</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+<code class="variable-group">set([</code><code class="variable-quote">'</code><code class="variable-string">common_filter</code><code class="variable-quote">'</code><code class="variable-op">,</code>
      <code class="variable-quote">'</code><code class="variable-string">fake_migrate</code><code class="variable-quote">'</code><code class="variable-op">,</code>
      <code class="variable-quote">'</code><code class="variable-string">fields</code><code class="variable-quote">'</code><code class="variable-op">,</code>
      <code class="variable-quote">'</code><code class="variable-string">format</code><code class="variable-quote">'</code><code class="variable-op">,</code>
      <code class="variable-quote">'</code><code class="variable-string">migrate</code><code class="variable-quote">'</code><code class="variable-op">,</code>
      <code class="variable-quote">'</code><code class="variable-string">on_define</code><code class="variable-quote">'</code><code class="variable-op">,</code>
      <code class="variable-quote">'</code><code class="variable-string">plural</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+     <code class="variable-quote">'</code><code class="variable-string">polymodel</code><code class="variable-quote">'</code><code class="variable-op">,</code>
 <code class="variable-ellipsis">...</code>
 </pre></td></tr></table>
 </dd>
@@ -2116,7 +2133,7 @@ h<code class="re-op">|</code>year<code class="re-op">|</code>month<code class="r
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Mon Oct  7 13:52:57 2013
+    Generated by Epydoc 3.0.1 on Thu Nov 28 13:54:37 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

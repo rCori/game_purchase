@@ -102,7 +102,7 @@
         <span class="summary-sig-arg">pool_size</span>=<span class="summary-sig-default">0</span>,
         <span class="summary-sig-arg">folder</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">db_codec</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">UTF-8</code><code class="variable-quote">'</code></span>,
-        <span class="summary-sig-arg">credential_decoder</span>=<span class="summary-sig-default">&lt;function IDENTITY at 0x3ea99b0&gt;</span>,
+        <span class="summary-sig-arg">credential_decoder</span>=<span class="summary-sig-default">&lt;function IDENTITY at 0x31ed1b8&gt;</span>,
         <span class="summary-sig-arg">driver_args</span>=<span class="summary-sig-default"><code class="variable-group">{</code><code class="variable-group">}</code></span>,
         <span class="summary-sig-arg">adapter_args</span>=<span class="summary-sig-default"><code class="variable-group">{</code><code class="variable-group">}</code></span>,
         <span class="summary-sig-arg">do_connect</span>=<span class="summary-sig-default">True</span>,
@@ -110,6 +110,24 @@
       x.__init__(...) initializes x; see help(type(x)) for signature</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="gluon.dal-pysrc.html#TeradataAdapter.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="gluon.dal.TeradataAdapter-class.html#close" class="summary-sig-name">close</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">action</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">commit</code><code class="variable-quote">'</code></span>,
+        <span class="summary-sig-arg">really</span>=<span class="summary-sig-default">True</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="gluon.dal-pysrc.html#TeradataAdapter.close">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -302,7 +320,6 @@
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="gluon.dal.ConnectionPool-class.html" onclick="show_private();">ConnectionPool</a></code></b>:
       <code><a href="gluon.dal.ConnectionPool-class.html#after_connection">after_connection</a></code>,
       <code><a href="gluon.dal.ConnectionPool-class.html#after_connection_hook">after_connection_hook</a></code>,
-      <code><a href="gluon.dal.ConnectionPool-class.html#close">close</a></code>,
       <code><a href="gluon.dal.ConnectionPool-class.html#find_or_make_work_folder">find_or_make_work_folder</a></code>,
       <code><a href="gluon.dal.ConnectionPool-class.html#reconnect">reconnect</a></code>
       </p>
@@ -469,7 +486,7 @@
         <span class="sig-arg">pool_size</span>=<span class="sig-default">0</span>,
         <span class="sig-arg">folder</span>=<span class="sig-default">None</span>,
         <span class="sig-arg">db_codec</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">UTF-8</code><code class="variable-quote">'</code></span>,
-        <span class="sig-arg">credential_decoder</span>=<span class="sig-default">&lt;function IDENTITY at 0x3ea99b0&gt;</span>,
+        <span class="sig-arg">credential_decoder</span>=<span class="sig-default">&lt;function IDENTITY at 0x31ed1b8&gt;</span>,
         <span class="sig-arg">driver_args</span>=<span class="sig-default"><code class="variable-group">{</code><code class="variable-group">}</code></span>,
         <span class="sig-arg">adapter_args</span>=<span class="sig-default"><code class="variable-group">{</code><code class="variable-group">}</code></span>,
         <span class="sig-arg">do_connect</span>=<span class="sig-default">True</span>,
@@ -486,6 +503,30 @@
     <dt>Overrides:
         object.__init__
         <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="close"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">close</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">action</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">commit</code><code class="variable-quote">'</code></span>,
+        <span class="sig-arg">really</span>=<span class="sig-default">True</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="gluon.dal-pysrc.html#TeradataAdapter.close">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="gluon.dal.ConnectionPool-class.html#close">ConnectionPool.close</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -641,7 +682,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Mon Oct  7 13:53:00 2013
+    Generated by Epydoc 3.0.1 on Thu Nov 28 13:54:40 2013
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

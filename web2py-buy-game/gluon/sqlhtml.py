@@ -17,11 +17,11 @@ import os
 from gluon.http import HTTP
 from gluon.html import XmlComponent
 from gluon.html import XML, SPAN, TAG, A, DIV, CAT, UL, LI, TEXTAREA, BR, IMG, SCRIPT
-from gluon.html import FORM, INPUT, LABEL, OPTION, SELECT
+from gluon.html import FORM, INPUT, LABEL, OPTION, SELECT, COL, COLGROUP
 from gluon.html import TABLE, THEAD, TBODY, TR, TD, TH, STYLE
 from gluon.html import URL, truncate_string, FIELDSET
 from gluon.dal import DAL, Field, Table, Row, CALLABLETYPES, smart_query, \
-    bar_encode, Reference, REGEX_TABLE_DOT_FIELD, Expression
+    bar_encode, Reference, REGEX_TABLE_DOT_FIELD, Expression, SQLCustomType
 from gluon.storage import Storage
 from gluon.utils import md5_hash
 from gluon.validators import IS_EMPTY_OR, IS_NOT_EMPTY, IS_LIST_OF, IS_DATE, \
@@ -490,7 +490,7 @@ class UploadWidget(FormWidget):
 
     DEFAULT_WIDTH = '150px'
     ID_DELETE_SUFFIX = '__delete'
-    GENERIC_DESCRIPTION = 'file'
+    GENERIC_DESCRIPTION = 'file ## download'
     DELETE_FILE = 'delete'
 
     @classmethod
@@ -540,7 +540,7 @@ class UploadWidget(FormWidget):
             else:
                 inp = DIV(inp,
                           SPAN('[',
-                               A(cls.GENERIC_DESCRIPTION, _href=url),
+                               A(current.T(cls.GENERIC_DESCRIPTION),_href=url),
                                ']', _style='white-space:nowrap'),
                           br, image)
         return inp
@@ -559,7 +559,7 @@ class UploadWidget(FormWidget):
         :param download_url: url for the file download (default = None)
         """
 
-        inp = cls.GENERIC_DESCRIPTION
+        inp = current.T(cls.GENERIC_DESCRIPTION)
 
         if download_url and value:
             if callable(download_url):
@@ -797,6 +797,61 @@ def formstyle_bootstrap(form, fields):
             parent.append(DIV(label, _controls, _class='control-group', _id=id))
     return parent
 
+def formstyle_bootstrap3(form, fields):
+    ''' bootstrap 3 format form layout '''
+    form.add_class('form-horizontal')
+    parent = FIELDSET()
+    for id, label, controls, help in fields:
+        # wrappers
+        _help = SPAN(help, _class='help-block')
+        # embed _help into _controls
+        _controls = DIV(controls, _help, _class='col-lg-4')
+        # submit unflag by default
+        _submit = False
+        if isinstance(controls, INPUT):
+            controls.add_class('col-lg-4')
+
+            if controls['_type'] == 'submit':
+                # flag submit button
+                _submit = True
+                controls['_class'] = 'btn btn-primary'
+            if controls['_type'] == 'button':
+                controls['_class'] = 'btn btn-default'
+            elif controls['_type'] == 'file':
+                controls['_class'] = 'input-file'
+            elif controls['_type'] == 'text':
+                controls['_class'] = 'form-control'
+            elif controls['_type'] == 'password':
+                controls['_class'] = 'form-control'
+            elif controls['_type'] == 'checkbox':
+                controls['_class'] = 'checkbox'
+
+
+
+        # For password fields, which are wrapped in a CAT object.
+        if isinstance(controls, CAT) and isinstance(controls[0], INPUT):
+            controls[0].add_class('col-lg-2')
+
+        if isinstance(controls, SELECT):
+            controls.add_class('form-control')
+
+        if isinstance(controls, TEXTAREA):
+            controls.add_class('form-control')
+
+        if isinstance(label, LABEL):
+            label['_class'] = 'col-lg-2 control-label'
+
+
+        if _submit:
+            # submit button has unwrapped label and controls, different class
+            parent.append(DIV(label, DIV(controls,_class="col-lg-4 col-lg-offset-2"), _class='form-group', _id=id))
+            # unflag submit (possible side effect)
+            _submit = False
+        else:
+            # unwrapped label
+            parent.append(DIV(label, _controls, _class='form-group', _id=id))
+    return parent
+
 
 class SQLFORM(FORM):
 
@@ -875,6 +930,7 @@ class SQLFORM(FORM):
         divs=formstyle_divs,
         ul=formstyle_ul,
         bootstrap=formstyle_bootstrap,
+        bootstrap3=formstyle_bootstrap3,
         inline=formstyle_inline,
     ))
 
@@ -1629,7 +1685,10 @@ class SQLFORM(FORM):
             name = str(field).replace('.', '-')
             # treat ftype 'decimal' as 'double'
             # (this fixes problems but needs refactoring!
-            ftype = field.type.split(' ')[0]
+            if isinstance(field.type, SQLCustomType):
+                            ftype = field.type.type.split(' ')[0]
+            else:
+                ftype = field.type.split(' ')[0]
             if ftype.startswith('decimal'): ftype = 'double'
             elif ftype=='bigint': ftype = 'integer'
             elif ftype.startswith('big-'): ftype = ftype[4:]
@@ -1913,22 +1972,26 @@ class SQLFORM(FORM):
                 tablenames += db._adapter.tables(join)
         tables = [db[tablename] for tablename in tablenames]
         if fields:
+            #add missing tablename to virtual fields
+            for table in tables:
+                for k,f in table.iteritems():
+                    if isinstance(f,Field.Virtual):
+                        f.tablename = table._tablename
             columns = [f for f in fields if f.tablename in tablenames]
         else:
             fields = []
             columns = []
+            filter1 = lambda f:isinstance(f,Field)
+            filter2 = lambda f:isinstance(f,Field) and f.readable
             for table in tables:
+                fields += filter(filter1, table)
+                columns += filter(filter2, table)
                 for k,f in table.iteritems():
                     if not k.startswith('_'):
-                        if isinstance(f,Field):
-                            fields.append(f) # these are selected
-                            if f.readable:
-                                columns.append(f) # these are displayed
-                        elif isinstance(f,Field.Virtual) and f.readable:
+                        if isinstance(f,Field.Virtual) and f.readable:
                             f.tablename = table._tablename
-                            columns.append(f)
                             fields.append(f)
-                        
+                            columns.append(f)
         if not field_id:
             if groupby is None:
                 field_id = tables[0]._id
@@ -1977,15 +2040,14 @@ class SQLFORM(FORM):
             _class='form_footer row_buttons %(header)s %(cornerbottom)s' % ui)
 
         create_form = update_form = view_form = search_form = None
-        sqlformargs = dict(formargs)
 
         if create and request.args(-2) == 'new':
             table = db[request.args[-1]]
+            sqlformargs = dict(ignore_rw=ignore_rw, formstyle=formstyle,
+                               _class='web2py_form')
+            sqlformargs.update(formargs)
             sqlformargs.update(createargs)
-            create_form = SQLFORM(
-                table, ignore_rw=ignore_rw, formstyle=formstyle,
-                _class='web2py_form',
-                **sqlformargs)
+            create_form = SQLFORM(table, **sqlformargs)
             create_form.process(formname=formname,
                                 next=referrer,
                                 onvalidation=onvalidation,
@@ -2002,11 +2064,12 @@ class SQLFORM(FORM):
         elif details and request.args(-3) == 'view':
             table = db[request.args[-2]]
             record = table(request.args[-1]) or redirect(referrer)
+            sqlformargs = dict(upload=upload, ignore_rw=ignore_rw,
+                               formstyle=formstyle, readonly=True,
+                               _class='web2py_form')
+            sqlformargs.update(formargs)
             sqlformargs.update(viewargs)
-            view_form = SQLFORM(
-                table, record, upload=upload, ignore_rw=ignore_rw,
-                formstyle=formstyle, readonly=True, _class='web2py_form',
-                **sqlformargs)
+            view_form = SQLFORM(table, record, **sqlformargs)
             res = DIV(buttons(edit=editable, record=record), view_form,
                       formfooter, _class=_class)
             res.create_form = create_form
@@ -2018,16 +2081,16 @@ class SQLFORM(FORM):
         elif editable and request.args(-3) == 'edit':
             table = db[request.args[-2]]
             record = table(request.args[-1]) or redirect(URL('error'))
+            deletable_ = deletable(record) \
+                if callable(deletable) else deletable
+            sqlformargs = dict(upload=upload, ignore_rw=ignore_rw,
+                               formstyle=formstyle, deletable=deletable_,
+                               _class='web2py_form',
+                               submit_button=T('Submit'),
+                               delete_label=T('Check to delete'))
+            sqlformargs.update(formargs)
             sqlformargs.update(editargs)
-            deletable_ = deletable(record) if callable(deletable) else deletable
-            update_form = SQLFORM(
-                table,
-                record, upload=upload, ignore_rw=ignore_rw,
-                formstyle=formstyle, deletable=deletable_,
-                _class='web2py_form',
-                submit_button=T('Submit'),
-                delete_label=T('Check to delete'),
-                **sqlformargs)
+            update_form = SQLFORM(table, record, **sqlformargs)
             update_form.process(
                 formname=formname,
                 onvalidation=onvalidation,
@@ -2237,14 +2300,18 @@ class SQLFORM(FORM):
             headcols.append(TH(header, _class=ui.get('default')))
 
         toadd = []
+        left_cols = 0
+        right_cols = 0
         if links and links_in_grid:
             for link in links:
                 if isinstance(link, dict):
                     toadd.append(TH(link['header'], _class=ui.get('default')))
             if links_placement in ['right', 'both']:
                 headcols.extend(toadd)
+                right_cols += len(toadd)
             if links_placement in ['left', 'both']:
                 linsert(headcols, 0, toadd)
+                left_cols += len(toadd)
 
         # Include extra column for buttons if needed.
         include_buttons_column = (details or editable or deletable or
@@ -2253,8 +2320,10 @@ class SQLFORM(FORM):
         if include_buttons_column:
             if buttons_placement in ['right', 'both']:
                 headcols.append(TH(_class=ui.get('default','')))
+                right_cols += 1
             if buttons_placement in ['left', 'both']:
                 headcols.insert(0, TH(_class=ui.get('default','')))
+                left_cols += 1
 
         head = TR(*headcols, **dict(_class=ui.get('header')))
 
@@ -2271,9 +2340,9 @@ class SQLFORM(FORM):
             limitby = (paginate*page,paginate*(page+1))
         else:
             limitby = None
-
         try:
-            table_fields = filter(lambda f: f.tablename in tablenames, fields)
+            table_fields = [field for field in fields
+                            if (field.tablename in tablenames and not(isinstance(field,Field.Virtual)))]
             if dbset._db._adapter.dbengine=='google:datastore':
                 rows = dbset.select(left=left,orderby=orderby,
                                     groupby=groupby,limitby=limitby,
@@ -2351,7 +2420,15 @@ class SQLFORM(FORM):
             limitby = None
 
         if rows:
-            htmltable = TABLE(THEAD(head))
+            cols = [COL(_id=str(c).replace('.', '-'),
+                        data={'column': left_cols + i + 1}) 
+                    for i,c in enumerate(columns)]
+            n = len(head.components)
+            cols = [COL(data={'column': i + 1}) for i in range(left_cols)] + \
+                   cols + \
+                   [COL(data={'column': left_cols + len(cols) + i + 1})
+                    for i in range(right_cols)]
+            htmltable = TABLE(COLGROUP(*cols),THEAD(head))
             tbody = TBODY()
             numrec = 0
             for row in rows:
@@ -2803,6 +2880,7 @@ class SQLTABLE(TABLE):
         selectid=None,
         renderstyle=False,
         cid=None,
+        colgroup=False,
         **attributes
         ):
 
@@ -2826,6 +2904,14 @@ class SQLTABLE(TABLE):
                 (t, f) = c.split('.')
                 field = sqlrows.db[t][f]
                 headers[c] = field.label
+        if colgroup:
+            cols = [COL(_id=c.replace('.', '-'), data={'column': i + 1}) 
+                    for i, c in enumerate(columns)]
+            if extracolumns:
+                cols += [COL(data={'column': len(cols) + i + 1})
+                         for i, c in enumerate(extracolumns)]
+            components.append(COLGROUP(*cols))
+            
         if headers is None:
             headers = {}
         else:

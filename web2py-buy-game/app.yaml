@@ -6,7 +6,7 @@
 # Adapted from examples/app.example.yaml
 
 application: buy-game
-version: 1
+version: 2
 api_version: 1
 
 # use this line for Python 2.5

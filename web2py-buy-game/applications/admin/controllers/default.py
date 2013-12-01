@@ -1,6 +1,7 @@
 # coding: utf8
 
 EXPERIMENTAL_STUFF = True
+MAXNFILES = 1000
 
 if EXPERIMENTAL_STUFF:
     if is_mobile:
@@ -230,7 +231,7 @@ def site():
             redirect(URL('design', args=appname))
         else:
             session.flash = \
-                DIV(T('unable to create application "%s"' % appname),
+                DIV(T('unable to create application "%s"', appname),
                     PRE(error))
         redirect(URL(r=request))
 
@@ -341,7 +342,7 @@ def pack():
         response.headers['Content-Disposition'] = disposition
         return safe_read(filename, 'rb')
     else:
-        session.flash = T('internal error: %s' % e)
+        session.flash = T('internal error: %s', e)
         redirect(URL('site'))
 
 def pack_plugin():
@@ -375,7 +376,7 @@ def pack_custom():
             response.headers['Content-Disposition'] = disposition
             return safe_read(filename, 'rb')
         else:
-            session.flash = T('internal error: %s' % e)
+            session.flash = T('internal error: %s', e)
             redirect(URL(args=request.args))
     def ignore(fs):
         return [f for f in fs if not (
@@ -563,36 +564,30 @@ def edit():
     # Load json only if it is ajax edited...
     app = get_app(request.vars.app)
     app_path = apath(app, r=request)
-    editor_defaults={'theme':'web2py', 'editor': 'default'}
+    editor_defaults={'theme':'web2py', 'editor': 'default', 'closetag': 'true', 'codefolding': 'false', 'tabwidth':'4', 'indentwithtabs':'false', 'linenumbers':'true', 'highlightline':'true'}
     config = Config(os.path.join(request.folder, 'settings.cfg'),
                     section='editor', default_values=editor_defaults)
     preferences = config.read()
 
-    if not(request.ajax):
+    if not(request.ajax) and not(is_mobile):
         # return the scaffolding, the rest will be through ajax requests
         response.title = T('Editing %s') % app
-        editarea_preferences = {}
-        editarea_preferences['FONT_SIZE'] = '10'
-        editarea_preferences['FULL_SCREEN'] = 'false'
-        editarea_preferences['ALLOW_TOGGLE'] = 'true'
-        editarea_preferences['REPLACE_TAB_BY_SPACES'] = '4'
-        editarea_preferences['DISPLAY'] = 'onload'
-        for key in editarea_preferences:
-            if key in globals():
-                editarea_preferences[key] = globals()[key]
-        return response.render ('default/edit.html', dict(app=request.args[0], editor_settings=preferences, editarea_preferences=editarea_preferences))
+        return response.render ('default/edit.html', dict(app=app, editor_settings=preferences))
 
     # show settings tab and save prefernces
     if 'settings' in request.vars:
         if request.post_vars:        #save new preferences
-            if config.save(request.post_vars.items()):
+            post_vars = request.post_vars.items()
+            # Since unchecked checkbox are not serialized, we must set them as false by hand to store the correct preference in the settings 
+            post_vars+= [(opt, 'false') for opt in editor_defaults if opt not in request.post_vars ]
+            if config.save(post_vars):
                 response.headers["web2py-component-flash"] = T('Preferences saved correctly')
             else:
                 response.headers["web2py-component-flash"] = T('Preferences saved on session only')
-            response.headers["web2py-component-command"] = "update_theme('%s');update_editor('%s');jQuery('a[href=#editor_settings] button.close').click();" % (config.read()['theme'], config.read()['editor'])
+            response.headers["web2py-component-command"] = "update_editor(%s);$('a[href=#editor_settings] button.close').click();" % response.json(config.read())
             return
         else:
-            details = {'filename':'settings', 'id':'editor_settings', 'force': False}
+            details = {'realfilename':'settings', 'filename':'settings', 'id':'editor_settings', 'force': False}
             details['plain_html'] = response.render('default/editor_settings.html', {'editor_settings':preferences})
             return response.json(details)
 
@@ -600,7 +595,7 @@ def edit():
     # Load json only if it is ajax edited...
     app = get_app(request.vars.app)
     filename = '/'.join(request.args)
-    response.title = request.args[-1]
+    realfilename = request.args[-1]
     if request.vars.app:
         path = abspath(filename)
     else:
@@ -615,7 +610,7 @@ def edit():
     elif filename[-4:] == '.css':
         filetype = 'css'
     elif filename[-3:] == '.js':
-        filetype = 'js'
+        filetype = 'javascript'
     else:
         filetype = 'html'
 
@@ -755,7 +750,9 @@ def edit():
         return response.json({'file_hash': file_hash, 'saved_on': saved_on, 'functions': functions, 'controller': controller, 'application': request.args[0], 'highlight': highlight})
     else:
         file_details = dict(app=request.args[0],
+                    editor_settings=preferences,
                     filename=filename,
+                    realfilename=realfilename,
                     filetype=filetype,
                     data=data,
                     edit_controller=edit_controller,
@@ -766,10 +763,15 @@ def edit():
                     view_link=view_link,
                     editviewlinks=editviewlinks,
                     id=IS_SLUG()(filename)[0],
-                    force= True if (request.vars.restore or request.vars.revert) else False)
+                    force= True if (request.vars.restore or 
+                                    request.vars.revert) else False)
         plain_html = response.render('default/edit_js.html', file_details)
         file_details['plain_html'] = plain_html
-        return response.json(file_details)
+        if is_mobile:
+            return response.render('default.mobile/edit.html', 
+                                   file_details, editor_settings=preferences)
+        else:
+            return response.json(file_details)
 
 
 def resolve():
@@ -1037,9 +1039,9 @@ def design():
     privates.sort()
 
     # Get all static files
-    MAXNFILES = 1000
-    statics = listdir(apath('%s/static/' % app, r=request), '[^\.#].*')
-    statics = [x.replace('\\', '/') for x in statics[:MAXNFILES]]
+    statics = listdir(apath('%s/static/' % app, r=request), '[^\.#].*',
+                      maxnum = MAXNFILES)
+    statics = [x.replace(os.path.sep, '/') for x in statics]
     statics.sort()
 
     # Get all languages
@@ -1173,8 +1175,9 @@ def plugin():
     privates.sort()
 
     # Get all static files
-    statics = listdir(apath('%s/static/' % app, r=request), '[^\.#].*')
-    statics = [x.replace('\\', '/') for x in statics]
+    statics = listdir(apath('%s/static/' % app, r=request), '[^\.#].*',
+                      maxnum = MAXNFILES)
+    statics = [x.replace(os.path.sep, '/') for x in statics]
     statics.sort()
 
     # Get all languages
@@ -1325,7 +1328,8 @@ def create_file():
                    from gluon import *\n""")[1:]
 
         elif (path[-8:] == '/static/') or (path[-9:] == '/private/'):
-            if request.vars.plugin and not filename.startswith('plugin_%s/' % request.vars.plugin):
+            if (request.vars.plugin and 
+                not filename.startswith('plugin_%s/' % request.vars.plugin)):
                 filename = 'plugin_%s/%s' % (request.vars.plugin, filename)
             text = ''
 
@@ -1791,3 +1795,55 @@ def git_push():
             session.flash = T("Push failed, there are unmerged entries in the cache. Resolve merge issues manually and try again.")
             redirect(URL('site'))
     return dict(app=app, form=form)
+
+def plugins():
+    app = request.args(0)
+    from serializers import loads_json
+    if not session.plugins:
+        rawlist = urllib.urlopen("http://www.web2pyslices.com/" +
+            "public/api.json/action/list/content/Package?package" +
+            "_type=plugin&search_index=false").read()
+        session.plugins = loads_json(rawlist)
+    plugins = TABLE(
+        *[TR(TD(H5(article["article"]["title"]),
+                A(T("Install"),
+                    _href=URL(c="default",
+                        f="install_plugin",
+                        args=[app,],
+                        vars={"source":
+                              article["package_data"]["download"],
+                              "plugin": article["article"]["title"]}
+                             ))),
+             TD(article["article"]["description"], BR(),
+                A(T("Plugin page"),
+                  _href="http://www.web2pyslices.com/slice/show/%s/" % \
+                  article["article"]["id"])),
+             TD(IMG(_src="http://www.web2pyslices.com/download/%s" % \
+                 article["article"]["thumbnail"])))
+          for article in session.plugins["results"]])
+    return dict(plugins=plugins, app=request.args(0))
+
+def install_plugin():
+    app = request.args(0)
+    source = request.vars.source
+    plugin = request.vars.plugin
+    if not (source and app):
+        raise HTTP(500, T("Invalid request"))
+    form = SQLFORM.factory()
+    result = None
+    if form.process().accepted:
+        # get w2p plugin
+        if "web2py.plugin." in source:
+            filename = "web2py.plugin.%s.w2p" % \
+                source.split("web2py.plugin.")[-1].split(".w2p")[0]
+        else:
+            filename = "web2py.plugin.%s.w2p" % cleanpath(plugin)
+        if plugin_install(app, urllib.urlopen(source),
+                          request, filename):
+            session.flash = T('New plugin installed: %s', filename)
+        else:
+            session.flash = \
+                T('unable to create application "%s"', filename)
+        redirect(URL(f="plugins", args=[app,]))
+    return dict(form=form, app=app, plugin=plugin, source=source)
+

@@ -294,14 +294,14 @@ class Request(Storage):
     def user_agent(self):
         from gluon.contrib import user_agent_parser
         session = current.session
-        user_agent = session._user_agent or \
-            user_agent_parser.detect(self.env.http_user_agent)
-        if session:
-            session._user_agent = user_agent
-        user_agent = Storage(user_agent)
+        user_agent = session._user_agent
+        if user_agent:
+            return user_agent
+        user_agent = user_agent_parser.detect(self.env.http_user_agent)
         for key, value in user_agent.items():
             if isinstance(value, dict):
                 user_agent[key] = Storage(value)
+        user_agent = session._user_agent = Storage(user_agent)
         return user_agent
 
     def requires_https(self):
@@ -976,10 +976,11 @@ class Session(Storage):
 
         # if not cookie_key, but session_data_name in cookies
         # expire session_data_name from cookies
-        if response.session_data_name in cookies:
-            rcookies[response.session_data_name] = 'expired'
-            rcookies[response.session_data_name]['path'] = '/'
-            rcookies[response.session_data_name]['expires'] = PAST
+        if not response.session_cookie_key:
+            if response.session_data_name in cookies:
+                rcookies[response.session_data_name] = 'expired'
+                rcookies[response.session_data_name]['path'] = '/'
+                rcookies[response.session_data_name]['expires'] = PAST
         if response.session_id:
             rcookies[response.session_id_name] = response.session_id
             rcookies[response.session_id_name]['path'] = '/'
