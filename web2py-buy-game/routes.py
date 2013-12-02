@@ -18,9 +18,9 @@ default_function = 'index'      # ordinarily set in app-specific routes.py
 # Example: support welcome, admin, app and myapp, with myapp the default:
 
 
-routes_app = ((r'/(?P<app>welcome|atakatu|admin)\b.*', r'\g<app>'),
-              (r'(.*)', r'atakatu'),
-              (r'/?(.*)', r'atakatu'))
+routes_app = ((r'/(?P<app>welcome|game_purchase|admin)\b.*', r'\g<app>'),
+              (r'(.*)', r'game_purchase'),
+              (r'/?(.*)', r'game_purchase'))
 
 # routes_in is a tuple of tuples.  The first item in each is a regexp that will
 # be used to match the incoming request URL. The second item in the tuple is
