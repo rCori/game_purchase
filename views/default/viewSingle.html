@@ -12,18 +12,25 @@
 
 <h1>{{=row.title}}</h1>
 <img src="{{=URL(f='download',args=row.user_image)}}">
-<p>bought by {{=row.user_ref.email}} at {{=row.store}}</p>
+<p>bought by {{=row.user_ref.email}} at {{=row.store}} in {{=row.store_loc}}</p>
 <p>Average Score: {{=row.average_score}}</p>
 <h1>{{=row.description}}</h1>
-<h4>${{=row.price}}</h4>
+<h4>${{="{0:0.2f}".format(row.price)}}</h4>
 <br>
+<br>
+<p>Submitted at: {{=row.time_submitted}}</p>
 <br>
 
-<br>
 
-<p>{{=row.time_submitted}}</p>
 
 <script>
+{{if auth.user:}}
+	var userID = {{=auth.user.id}};
+{{else:}}
+	var userID = -1;
+{{pass}}
+var purchaseID = {{=row.id}}
+
 $(function() {
 	$( "#slider" ).slider({
 		step:1,
@@ -34,17 +41,26 @@ $(function() {
 			$('#slider_val').html(selection);
 		}
 	});
-	$("#submit_rev").click({
-	
+	$("#submit_rev").click(function(){
+		var review = $.post("{{=URL('default','review')}}",
+			{user:userID, purchase:purchaseID, score:$( "#slider" ).slider( "value" )})
+			.done(function(data){
+				//jconsole.log(data);
+				$("#note").html(data)
+			});
 	});
 });
-
-
 </script>
+{{if auth.user:}}
 <div id="slider"></div>
 <button id="submit_rev">submit</button>
 <br>
 <span id="slider_val"></span>
+<br>
+<span id="note"></span>
+{{else:}}
+<h3>You must be logged in to review other people's purchases</h3>
+{{pass}}
 
 
 {{else:}}
@@ -53,4 +69,3 @@ $(function() {
 <h1> Oops, you weren't supposed to see this, please go back</h1>
 
 {{pass}}
-

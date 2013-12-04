@@ -1,5 +1,22 @@
 {{extend 'layout.html'}}
 
+<select id="storedrop">
+  <option value="All"> </option>
+  <option value="GameStop">GameStop</option>
+  <option value="Amazon">Amazon</option>
+  <option value="Best Buy">Best Buy</option>
+  <option value="Target">Target</option>
+  <option value="Wal-Mart">Wal-Mart</option>
+  <option value="Toys \'R Us">Toys 'R Us</option>
+  <option value="Ebay">Ebay</option>
+  <option value="Craigslist">Craigslist</option>
+  <option value="FuncoLand">FuncoLand</option>
+  <option value="EB Games">EB Games</option>
+  <option value="GAME">GAME</option>
+  <option value="other">other</option>
+</select>
+<button id="sort">Sort</button>
+
 <div id="toplogo" style="max-width:499px;">
     <img src="{{=URL('static','images/smalllogo.png')}}">
 </div>
@@ -15,7 +32,7 @@
 		<td style="vertical-align:middle;">
             <span style="font-family:Arial; font-weight:900; font-size:150%;">{{=row.title}}</span>
             <br>
-            <span style="font-family:Arial; font-weight:900;">{{=row.description}} at {{=row.store}} for ${{=row.price}}</span>
+            <span style="font-family:Arial; font-weight:900;">{{=row.description}} at {{=row.store}} in {{=row.store_loc}} for ${{="{0:0.2f}".format(row.price)}}</span>
 			<br>
 			<span style="font-family:Arial; font-weight:900;">bought by {{=row.user_ref.email}} on {{=row.time_submitted}}</span>
 		</td>
@@ -25,3 +42,22 @@
 	</tr>
 {{pass}}
 </table>
+
+
+
+<script>
+    /*
+    $("#sort").click(function(){
+        $.get("{{#=URL('default','sortPurchase')}}",
+            {store:$("#storedrop").val()})
+            .success(function(data){
+                console.log(data);
+            });
+    });
+    */
+    //This is a hack to get this to work quickly
+    $("#sort").click(function(){
+        var newStore = $("#storedrop").val()
+        window.location.href = "{{=URL('default','viewPurchases')}}?store="+newStore;
+    });
+</script>

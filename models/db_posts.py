@@ -12,7 +12,8 @@ db.define_table('purchase',
 				Field('price','float'),
                 Field('description','text'),
 				Field('time_submitted','datetime',default=request.now),
-				Field('average_score','float'))
+				Field('average_score','float'),
+                Field('review_count','integer',default=0))
 
 
 #Comments that people can leave on a post

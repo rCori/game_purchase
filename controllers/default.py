@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # this file is released under public domain and you can use without limitations
-
 #########################################################################
 ## This is a sample controller
 ## - index is the default action of any application
@@ -8,20 +7,16 @@
 ## - download is for downloading files uploaded in the db (does streaming)
 ## - call exposes all registered services (none by default)
 #########################################################################
-
 import os
-
+import json
 def index():
     """
     example action using the internationalization operator T and flash
     rendered by views/default/index.html or views/generic.html
-
     if you need a simple wiki simple replace the two lines below with:
     return auth.wiki()
     """
     return dict()
-
-
 def user():
     """
     exposes:
@@ -38,7 +33,6 @@ def user():
     to decorate functions that need access control
     """
     return dict(form=auth())
-
 @cache.action()
 def download():
     """
@@ -46,8 +40,6 @@ def download():
     http://..../[app]/default/download/[filename]
     """
     return response.download(request, db)
-
-
 def call():
     """
     exposes services. for example:
@@ -56,8 +48,6 @@ def call():
     supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv
     """
     return service()
-
-
 @auth.requires_signature()
 def data():
     """
@@ -74,7 +64,7 @@ def data():
       LOAD('default','data.load',args='tables',ajax=True,user_signature=True)
     """
     return dict(form=crud())
-	
+
 #This is the page for a user to submit a purchase.
 @auth.requires_login()
 def submitPurchase():
@@ -91,23 +81,27 @@ def submitPurchase():
 		logger.info('request.vars.user_image is:'+str(request.vars.user_image))
 		#myFile = db.purchase.user_image.store(request.vars.user_image,form.vars.user_image)
 		db.purchase.insert(user_ref=auth.user, title = form.vars.Title,
-							user_image=form.vars.user_image, 
+							user_image=form.vars.user_image,
 							description=form.vars.Description,
 							store=form.vars.store,
 							store_loc = form.vars.located,
-							price = round(form.vars.price,2),
+							price = round(form.vars.price,2)+0.00,
 							average_score = 0
 							)
 	return dict(form=form)
-	
+
 def viewPurchases():
 	if request.vars['pgnum']:
 		page = request.vars['pgnum']
 	else:
 		page = 0
-	rows = db(db.purchase.id > 0).select(orderby=~db.purchase.time_submitted, limitby=(0+(page*25),25+(page*25)))
-	return dict(rows=rows)
-	
+        if request.vars['store']:
+            if request.vars['store'] != "All":
+                rows = db(db.purchase.store == request.vars['store']).select(orderby=~db.purchase.time_submitted)
+                return dict(rows=rows)
+        rows = db(db.purchase.id > 0).select(orderby=~db.purchase.time_submitted, limitby=(0+(page*25),25+(page*25)))
+        return dict(rows=rows)
+
 def viewSingle():
 	if request.args(0):
 		myID=request.args(0)
@@ -115,4 +109,43 @@ def viewSingle():
 		return dict(row=row)
 	else:
 		return dict()
-		
+
+@request.restful()
+def review():
+	def POST(**vars):
+		myRow = db((db.rating.user_ref == vars['user']) & (db.rating.purchase_ref == vars['purchase'])).select().first()
+		if myRow == None:
+			#Insert a new review into the table
+			db.rating.insert(user_ref=vars['user'], purchase_ref=vars['purchase'], rating=vars['score'])
+                        purchaseRow = db(db.purchase.id == vars['purchase']).select().first()
+                        db(db.purchase.id == vars['purchase']).update(review_count = purchaseRow.review_count+1)
+                        vScore = float(vars['score'])
+                        newScore = purchaseRow.average_score + vScore
+                        rCount = purchaseRow.review_count+1
+                        fScore = newScore/float(rCount)
+                        db(db.purchase.id == vars['purchase']).update(average_score = fScore)
+                        return "Thank you for reviewing"
+		else:
+			#update the currently existing row in the review table
+			rating = db((db.rating.user_ref == vars['user']) & (db.rating.purchase_ref == vars['purchase'])).select().first()
+                        db((db.rating.user_ref == vars['user']) & (db.rating.purchase_ref == vars['purchase'])).update(rating=vars['score'])
+                        purchaseRow = db(db.purchase.id == vars['purchase']).select().first()
+                        vScore = float(vars['score'])
+                        rCount = float(purchaseRow.review_count)
+                        allRatings = purchaseRow.average_score*rCount
+                        newTotal = allRatings - float(rating.rating)
+                        fTotal = newTotal + vScore
+                        newAvg = fTotal/rCount
+                        db(db.purchase.id == vars['purchase']).update(average_score = newAvg)
+			return "You have updated your review"
+	return dict(POST=POST)
+
+@request.restful()
+def sortPurchase():
+    def GET(**vars):
+        print vars['store']
+        selectedRows = db(db.purchase.store == vars['store']).select()
+        jsonRows = json.dumps([[row.id] for row in selectedRows])
+        print jsonRows
+        return jsonRows
+    return dict(GET=GET)
