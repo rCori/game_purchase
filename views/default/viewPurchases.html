@@ -42,6 +42,10 @@
 	</tr>
 {{pass}}
 </table>
+{{if page!=0:}}
+<button id ="Previous">Previous</button>
+{{pass}}
+<button id="Next">Next</button>
 
 
 
@@ -55,9 +59,20 @@
             });
     });
     */
+	var curPage = {{=page}};
     //This is a hack to get this to work quickly
     $("#sort").click(function(){
         var newStore = $("#storedrop").val()
         window.location.href = "{{=URL('default','viewPurchases')}}?store="+newStore;
     });
+	
+	$("#Previous").click(function(){
+		var newPage = curPage-1;
+		window.location.href = "{{=URL('default','viewPurchases')}}?pgnum="+newPage;
+	});
+	
+	$("#Next").click(function(){
+		var newPage = curPage+1;
+		window.location.href = "{{=URL('default','viewPurchases')}}?pgnum="+newPage;
+	});
 </script>

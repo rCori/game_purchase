@@ -92,15 +92,15 @@ def submitPurchase():
 
 def viewPurchases():
 	if request.vars['pgnum']:
-		page = request.vars['pgnum']
+		page = int(request.vars['pgnum'])
 	else:
 		page = 0
         if request.vars['store']:
             if request.vars['store'] != "All":
                 rows = db(db.purchase.store == request.vars['store']).select(orderby=~db.purchase.time_submitted)
-                return dict(rows=rows)
+                return dict(rows=rows,page=page)
         rows = db(db.purchase.id > 0).select(orderby=~db.purchase.time_submitted, limitby=(0+(page*25),25+(page*25)))
-        return dict(rows=rows)
+        return dict(rows=rows,page=page)
 
 def viewSingle():
 	if request.args(0):
