@@ -45,15 +45,32 @@ $(function() {
 		var review = $.post("{{=URL('default','review')}}",
 			{user:userID, purchase:purchaseID, score:$( "#slider" ).slider( "value" )})
 			.done(function(data){
-				//jconsole.log(data);
 				$("#note").html(data)
 			});
 	});
+	{{if auth.user:}}
+	$('#submit_comment').click(function(){
+		$.post("{{=URL('default','newComment')}}",
+		{user:userID, purchase:purchaseID, newComment:$('#newComment').val()});
+	});
+	{{pass}}
 });
+
+
 </script>
+<h3>Comments:</h3>
+{{for comment in comments:}}
+<textarea readonly="yes">{{=comment.user_comment}}</textarea>
+{{pass}}
+<br>
+
 {{if auth.user:}}
+<textarea id="newComment"></textarea>
+<button id="submit_comment">Leave a Comment</button>
+<br>
+<br>
 <div id="slider"></div>
-<button id="submit_rev">submit</button>
+<button id="submit_rev">Submit</button>
 <br>
 <span id="slider_val"></span>
 <br>

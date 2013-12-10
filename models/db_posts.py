@@ -16,8 +16,14 @@ db.define_table('purchase',
                 Field('review_count','integer',default=0))
 
 
-#Comments that people can leave on a post
+#Ratings that people can leave on a post
 db.define_table('rating',
                 Field('user_ref','reference auth_user'),
                 Field('purchase_ref','reference purchase'),
                 Field('rating','integer',requires=IS_INT_IN_RANGE(1,10)))
+
+
+db.define_table('user_comment',
+                Field('user_ref','reference auth_user'),
+                Field('purchase_ref','reference purchase'),
+                Field('user_comment','text'))

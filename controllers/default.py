@@ -77,8 +77,6 @@ def submitPurchase():
 			Field('price','float'),
 			table_name='purchase')
 	if form.accepts(request.vars,formname='form'):
-		logger.info('form.vars.user_image is:'+form.vars.user_image)
-		logger.info('request.vars.user_image is:'+str(request.vars.user_image))
 		#myFile = db.purchase.user_image.store(request.vars.user_image,form.vars.user_image)
 		db.purchase.insert(user_ref=auth.user, title = form.vars.Title,
 							user_image=form.vars.user_image,
@@ -106,7 +104,8 @@ def viewSingle():
 	if request.args(0):
 		myID=request.args(0)
 		row = db(db.purchase.id == myID).select().first()
-		return dict(row=row)
+		comments = db(db.user_comment.purchase_ref == myID).select()
+		return dict(row=row,comments=comments)
 	else:
 		return dict()
 
@@ -143,9 +142,16 @@ def review():
 @request.restful()
 def sortPurchase():
     def GET(**vars):
-        print vars['store']
         selectedRows = db(db.purchase.store == vars['store']).select()
         jsonRows = json.dumps([[row.id] for row in selectedRows])
-        print jsonRows
         return jsonRows
     return dict(GET=GET)
+	
+	
+@request.restful()
+def newComment():
+	def POST(**vars):
+		if vars['newComment'] != "":
+			db.user_comment.insert(user_ref = vars['user'], purchase_ref=vars['purchase'], user_comment=vars['newComment'])
+		return
+	return dict(POST=POST)
