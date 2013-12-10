@@ -15,7 +15,7 @@
   <option value="GAME">GAME</option>
   <option value="other">other</option>
 </select>
-<button id="sort">Sort</button>
+<input type="image" id="sort" src="{{=URL('static','images/sortbutton.jpg')}}">
 
 <div id="toplogo" style="max-width:499px;">
     <img src="{{=URL('static','images/smalllogo.png')}}">
@@ -43,9 +43,9 @@
 {{pass}}
 </table>
 {{if page!=0:}}
-<button id ="Previous">Previous</button>
+<input type="image" id ="Previous" src="{{=URL('static','images/previousbutton.jpg')}}">
 {{pass}}
-<button id="Next">Next</button>
+<input type="image" id="Next" src="{{=URL('static','images/nextbutton.jpg')}}">
 
 
 

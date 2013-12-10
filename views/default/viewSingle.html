@@ -51,7 +51,11 @@ $(function() {
 	{{if auth.user:}}
 	$('#submit_comment').click(function(){
 		$.post("{{=URL('default','newComment')}}",
-		{user:userID, purchase:purchaseID, newComment:$('#newComment').val()});
+		{user:userID, purchase:purchaseID, newComment:$('#newComment').val()})
+		.done(function(data){
+			//window.location.href = "{{=URL('default','viewSingle')}}/"+{{=row.id}};
+			location.reload();
+		});
 	});
 	{{pass}}
 });
@@ -70,7 +74,7 @@ $(function() {
 <br>
 <br>
 <div id="slider"></div>
-<button id="submit_rev">Submit</button>
+<input type="image" id="submit_rev" src="{{=URL('static','images/submitbutton.jpg')}}">
 <br>
 <span id="slider_val"></span>
 <br>
