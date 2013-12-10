@@ -70,16 +70,13 @@ def data():
 def submitPurchase():
 	form = SQLFORM.factory(
 			Field('Title','string'),
-			Field('user_image','upload',uploadfolder=os.path.join(request.folder,'uploads'),uploadseparate=True),
 			Field('Description','text'),
 			Field('store', requires=IS_IN_SET(['GameStop','Amazon','Best Buy','Target','Wal-Mart','Toys \'R Us', 'Ebay', 'Craigslist','FuncoLand','EB Games', 'GAME','other'])),
 			Field('located','string'),
 			Field('price','float'),
 			table_name='purchase')
 	if form.accepts(request.vars,formname='form'):
-		#myFile = db.purchase.user_image.store(request.vars.user_image,form.vars.user_image)
 		db.purchase.insert(user_ref=auth.user, title = form.vars.Title,
-							user_image=form.vars.user_image,
 							description=form.vars.Description,
 							store=form.vars.store,
 							store_loc = form.vars.located,

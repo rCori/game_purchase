@@ -27,11 +27,9 @@
 {{for row in rows:}}
 	<tr>
 		<td>
-            <a href="{{=URL('default','viewSingle',args=row.id)}}"><img src="{{=URL(f='download',args=row.user_image)}}" style="max-height:200px;"></a>
+            <a href="{{=URL('default','viewSingle',args=row.id)}}">{{=row.title}}</a>
 		</td>
 		<td style="vertical-align:middle;">
-            <span style="font-family:Arial; font-weight:900; font-size:150%;">{{=row.title}}</span>
-            <br>
             <span style="font-family:Arial; font-weight:900;">{{=row.description}} at {{=row.store}} in {{=row.store_loc}} for ${{="{0:0.2f}".format(row.price)}}</span>
 			<br>
 			<span style="font-family:Arial; font-weight:900;">bought by {{=row.user_ref.email}} on {{=row.time_submitted}}</span>
