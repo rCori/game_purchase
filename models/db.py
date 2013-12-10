@@ -16,7 +16,7 @@ else:
     ## connect to Google BigTable (optional 'google:datastore://namespace')
     # db = DAL('google:datastore')
     ## If you want to use Google Cloud SQL, use something like:
-	db = DAL('google:sql://buy-game:newcloudsql/gamepurchasedb', migrate_enabled=False)
+	db = DAL('google:sql://buy-game:newcloudsql/gamepurchasedb', migrate_enabled=True)
 
     
     ## store sessions and tickets there
